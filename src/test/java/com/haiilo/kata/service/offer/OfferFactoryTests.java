@@ -1,11 +1,8 @@
 package com.haiilo.kata.service.offer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.haiilo.kata.domainobject.OfferDO;
 import org.junit.jupiter.api.Test;
@@ -21,7 +18,7 @@ class OfferFactoryTests {
         OfferFactory factory = new OfferFactory();
 
         OfferDO a = offer(1, OfferFactory.OfferType.N_FOR_FIXED.toString(), "APPLE", "{\"n\":2,\"bundlePriceInMinor\":45}");
-        OfferDO b = offer(1, OfferFactory.OfferType.N_FOR_FIXED.toString(), "APPLE", "{\"n\":2,\"bundlePriceInMinor\":45}");
+        OfferDO b = offer(1, OfferFactory.OfferType.N_FOR_FIXED.toString(), "PEACH", "{\"n\":2,\"bundlePriceInMinor\":45}");
 
         Offer o1 = factory.getOrCreate(a);
         Offer o2 = factory.getOrCreate(b);
@@ -33,7 +30,7 @@ class OfferFactoryTests {
     void getOrCreate_returnsDifferentInstances_forDifferentOfferIds() {
         OfferFactory factory = new OfferFactory();
 
-        OfferDO a = offer(1, OfferFactory.OfferType.N_FOR_FIXED.toString(), "APPLE", "{\"n\":2,\"bundlePriceInMinor\":45}");
+        OfferDO a = offer(1, OfferFactory.OfferType.N_FOR_FIXED.toString(), "BANANA", "{\"n\":2,\"bundlePriceInMinor\":45}");
         OfferDO b = offer(2, OfferFactory.OfferType.N_FOR_FIXED.toString(), "APPLE", "{\"n\":2,\"bundlePriceInMinor\":45}");
 
         Offer o1 = factory.getOrCreate(a);

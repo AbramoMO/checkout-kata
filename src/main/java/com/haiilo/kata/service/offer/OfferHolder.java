@@ -5,31 +5,24 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public final class OfferHolder
-{
+public final class OfferHolder {
+
     private final Offer offer;
     private Integer remaining; // null = unlimited
 
-
-    public OfferHolder(Offer offer, Integer remaining)
-    {
+    public OfferHolder(Offer offer, Integer remaining) {
         this.offer = offer;
         this.remaining = remaining;
     }
 
-
-    public boolean hasRemaining()
-    {
+    public boolean hasRemaining() {
         return remaining == null || remaining > 0;
     }
 
-
-    public void applyOffer(String itemName, List<ItemContainer> itemContainers)
-    {
+    public void applyOffer(String itemName, List<ItemContainer> itemContainers) {
         offer.applyOffer(itemName, itemContainers);
 
-        if (remaining != null)
-        {
+        if (remaining != null) {
             remaining--;
         }
     }

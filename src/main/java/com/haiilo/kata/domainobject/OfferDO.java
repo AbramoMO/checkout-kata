@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OfferDO
-{
+public class OfferDO {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

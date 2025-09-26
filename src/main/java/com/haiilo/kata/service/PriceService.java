@@ -24,8 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PriceService
-{
+public class PriceService {
 
     private final ItemRepository itemRepository;
     private final OfferRepository offerRepository;
@@ -33,11 +32,9 @@ public class PriceService
 
 
     @Transactional(readOnly = true)
-    public int calculateTotalPrice(CheckoutRequest checkoutRequest)
-    {
+    public int calculateTotalPrice(CheckoutRequest checkoutRequest) {
         List<String> items = checkoutRequest.items();
-        if (items == null || items.isEmpty())
-        {
+        if (items == null || items.isEmpty()) {
             log.info("No items in checkoutRequest");
             return 0;
         }
@@ -61,36 +58,38 @@ public class PriceService
             .toList();
 
         // offers which could be applied to given items
-        List<OfferDO> availableOffers = offerRepository.findByItemIn(new HashSet<>(itemToCount.keySet()));
+        List<OfferDO> availableOffers = offerRepository.findByItemIn(
+            new HashSet<>(itemToCount.keySet()));
         Map<String, List<OfferHolder>> offersByItem = availableOffers.stream()
             .collect(Collectors.groupingBy(
                 OfferDO::getItem,
-                Collectors.mapping(offerDo -> new OfferHolder(offerFactory.getOrCreate(offerDo), offerDo.getUsageLimit()), Collectors.toList())
+                Collectors.mapping(offerDo -> new OfferHolder(offerFactory.getOrCreate(offerDo),
+                    offerDo.getUsageLimit()), Collectors.toList())
             ));
 
         return calculateTotalPrice(itemContainers, offersByItem);
     }
 
 
-    private static int calculateTotalPrice(List<ItemContainer> itemContainers, Map<String, List<OfferHolder>> offersByItem)
-    {
+    private static int calculateTotalPrice(List<ItemContainer> itemContainers,
+        Map<String, List<OfferHolder>> offersByItem) {
         log.info("Calculating total price");
         int totalPrice = 0;
 
-        for (ItemContainer itemContainer : itemContainers)
-        {
-            List<OfferHolder> availableOffersForItem = offersByItem.getOrDefault(itemContainer.getItemName(), List.of()).stream().toList();
+        for (ItemContainer itemContainer : itemContainers) {
+            List<OfferHolder> availableOffersForItem = offersByItem.getOrDefault(
+                itemContainer.getItemName(), List.of()).stream().toList();
 
-            while (itemContainer.getCountToEvaluate() > 0)
-            {
+            while (itemContainer.getCountToEvaluate() > 0) {
                 // customer-oriented - we choose the best offer, which gives the biggest discount
                 OfferHolder bestOffer = availableOffersForItem.stream()
-                    .filter(offerHolder -> offerHolder.hasRemaining() && offerHolder.getOffer().isApplicableFor(itemContainers))
-                    .max(Comparator.comparingInt(offerHolder -> offerHolder.getOffer().calculateDiscountedAmount(itemContainers)))
+                    .filter(offerHolder -> offerHolder.hasRemaining() && offerHolder.getOffer()
+                        .isApplicableFor(itemContainers))
+                    .max(Comparator.comparingInt(
+                        offerHolder -> offerHolder.getOffer().calculateDiscountedAmount(itemContainers)))
                     .orElse(null);
 
-                if (bestOffer == null)
-                {
+                if (bestOffer == null) {
                     break;
                 }
 
@@ -98,7 +97,8 @@ public class PriceService
             }
 
             // counting leftover items without discount
-            totalPrice += itemContainer.getTotalPrice() + itemContainer.getCountToEvaluate() * itemContainer.getPriceInMinor();
+            totalPrice += itemContainer.getTotalPrice()
+                + itemContainer.getCountToEvaluate() * itemContainer.getPriceInMinor();
         }
 
         return totalPrice;

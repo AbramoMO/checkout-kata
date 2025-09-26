@@ -14,13 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class SupermarketCheckoutController
-{
+public class SupermarketCheckoutController {
+
     private final PriceService priceService;
 
     @PostMapping("checkout")
-    public ResponseEntity<CheckoutResponse> checkout(@Valid @RequestBody CheckoutRequest checkoutRequest)
-    {
+    public ResponseEntity<CheckoutResponse> checkout(@Valid @RequestBody CheckoutRequest checkoutRequest) {
         int totalPriceInMinor = priceService.calculateTotalPrice(checkoutRequest);
         return ResponseEntity.ok(new CheckoutResponse(totalPriceInMinor));
     }

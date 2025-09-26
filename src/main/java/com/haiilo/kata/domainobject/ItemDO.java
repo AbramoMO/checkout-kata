@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemDO
-{
+public class ItemDO {
+
     @Id
     private String name;
 

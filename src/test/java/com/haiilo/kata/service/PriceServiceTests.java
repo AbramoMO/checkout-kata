@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.haiilo.kata.domainobject.ItemDO;
 import com.haiilo.kata.domainobject.OfferDO;
 import com.haiilo.kata.domaintransferobject.CheckoutRequest;
@@ -59,7 +60,8 @@ class PriceServiceTests {
 
     @BeforeEach
     void setUp() {
-        OfferFactory offerFactory = new OfferFactory();
+        ObjectMapper objectMapper = new ObjectMapper();
+        OfferFactory offerFactory = new OfferFactory(objectMapper);
         priceService = new PriceService(itemRepository, offerRepository, offerFactory);
 
         lenient().when(itemRepository.findAllById(anySet())).thenReturn(defaultItems);
@@ -74,7 +76,7 @@ class PriceServiceTests {
     // ---------- Tests ----------
     @Test
     void calculateTotalPrice_zeroForEmptyBasket() {
-        int total = priceService.calculateTotalPrice(makeRequest(Collections.emptyList()));
+        long total = priceService.calculateTotalPrice(makeRequest(Collections.emptyList()));
         assertEquals(0, total);
     }
 
@@ -86,15 +88,15 @@ class PriceServiceTests {
         when(itemRepository.findAllById(anySet())).thenReturn(defaultItems.stream().filter(x -> items.contains(x.getName())).toList());
         when(offerRepository.findByItemIn(anySet())).thenReturn(defaultOffers.stream().filter(x -> itemsSet.contains(x.getItem())).toList());
 
-        int total = priceService.calculateTotalPrice(makeRequest(items));
+        long total = priceService.calculateTotalPrice(makeRequest(items));
         assertEquals(45, total);
     }
 
     @Test
     void calculateTotalPrice_offersUsageLimits() {
-        int total1 = priceService.calculateTotalPrice(makeRequest(Arrays.asList(APPLE, APPLE, APPLE)));
-        int total2 = priceService.calculateTotalPrice(makeRequest(Arrays.asList(APPLE, APPLE, APPLE, APPLE)));  // 2*45
-        int total3 = priceService.calculateTotalPrice(makeRequest(Arrays.asList(BANANA, BANANA, BANANA, BANANA, BANANA, BANANA, BANANA, BANANA)));
+        long total1 = priceService.calculateTotalPrice(makeRequest(Arrays.asList(APPLE, APPLE, APPLE)));
+        long total2 = priceService.calculateTotalPrice(makeRequest(Arrays.asList(APPLE, APPLE, APPLE, APPLE)));  // 2*45
+        long total3 = priceService.calculateTotalPrice(makeRequest(Arrays.asList(BANANA, BANANA, BANANA, BANANA, BANANA, BANANA, BANANA, BANANA)));
         assertEquals(APPLE_2_BUNDLE_PRICE + APPLE_PRICE, total1);
         assertEquals(APPLE_2_BUNDLE_PRICE * 2, total2);
         assertEquals(BANANA_PRICE * 3 + BANANA_2_BUNDLE_PRICE + BANANA_3_BUNDLE_PRICE, total3);
@@ -102,7 +104,7 @@ class PriceServiceTests {
 
     @Test
     void calculateTotalPrice_mixedBasket() {
-        int total = priceService.calculateTotalPrice(makeRequest(Arrays.asList(APPLE, BANANA, PEACH, PEACH, KIWI)));
+        long total = priceService.calculateTotalPrice(makeRequest(Arrays.asList(APPLE, BANANA, PEACH, PEACH, KIWI)));
         assertEquals(APPLE_PRICE + BANANA_PRICE + PEACH_PRICE * 2 + KIWI_PRICE, total); // 2 apples -> 45; 1 banana -> 50
     }
 
@@ -111,8 +113,8 @@ class PriceServiceTests {
         List<String> a = Arrays.asList(APPLE, APPLE, BANANA, BANANA, PEACH, BANANA, BANANA, BANANA);
         List<String> b = Arrays.asList(BANANA, APPLE, BANANA, APPLE, BANANA, BANANA, BANANA, PEACH);
 
-        int totalA = priceService.calculateTotalPrice(makeRequest(a));
-        int totalB = priceService.calculateTotalPrice(makeRequest(b));
+        long totalA = priceService.calculateTotalPrice(makeRequest(a));
+        long totalB = priceService.calculateTotalPrice(makeRequest(b));
         assertEquals(totalA, totalB);
         assertEquals(APPLE_2_BUNDLE_PRICE + BANANA_2_BUNDLE_PRICE + BANANA_3_BUNDLE_PRICE + PEACH_PRICE, totalA); // 5 bananas (220) + 2 apples (45)
     }
@@ -128,8 +130,8 @@ class PriceServiceTests {
 
     @Test
     void calculateTotalPrice_acceptsCaseInsensitiveItemNames() {
-        int apples = priceService.calculateTotalPrice(makeRequest(Arrays.asList(APPLE.toLowerCase(), APPLE, APPLE.toUpperCase())));   // 3 apples -> 75
-        int bananas = priceService.calculateTotalPrice(makeRequest(Arrays.asList("BaNaNa", BANANA, BANANA))); // 3 bananas -> 130
+        long apples = priceService.calculateTotalPrice(makeRequest(Arrays.asList(APPLE.toLowerCase(), APPLE, APPLE.toUpperCase())));   // 3 apples -> 75
+        long bananas = priceService.calculateTotalPrice(makeRequest(Arrays.asList("BaNaNa", BANANA, BANANA))); // 3 bananas -> 130
         assertEquals(APPLE_2_BUNDLE_PRICE + APPLE_PRICE, apples);
         assertEquals(BANANA_3_BUNDLE_PRICE, bananas);
     }

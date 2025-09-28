@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(Map.of(
             "timestamp", Instant.now().toString(),
             "status", HttpStatus.BAD_REQUEST.value(),
-            "error", "Bad Request",
+            "error", HttpStatus.BAD_REQUEST,
             "message", ex.getMessage()
         ));
     }

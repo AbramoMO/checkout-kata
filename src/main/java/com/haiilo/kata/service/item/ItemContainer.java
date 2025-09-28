@@ -12,23 +12,20 @@ public class ItemContainer {
     private final int priceInMinor;
     private final int count;
     private int evaluatedCount;
-    private int totalPrice;
+    private long totalPrice;
 
-
-    public int getCountToEvaluate() {
+    public long getCountToEvaluate() {
         return count - evaluatedCount;
     }
 
-
-    public void increaseEvaluatedCount(int cnt) {
-        if (getCountToEvaluate() < cnt) {
+    public void increaseEvaluatedCount(int count) {
+        if (getCountToEvaluate() < count) {
             throw new IllegalArgumentException("Not enough items to evaluate");
         }
-        evaluatedCount += cnt;
+        evaluatedCount += count;
     }
 
-
-    public void increaseTotalPrice(int priceInMinor) {
+    public void increaseTotalPrice(long priceInMinor) {
         totalPrice += priceInMinor;
     }
 }

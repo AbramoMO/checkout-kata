@@ -1,19 +1,19 @@
 package com.haiilo.kata.service.offer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.haiilo.kata.exception.ItemNotFoundException;
 import com.haiilo.kata.service.item.ItemContainer;
 import java.util.List;
-import lombok.NoArgsConstructor;
 
 /**
  * Base class for Offers to make it extendable by different types of offers
  */
-@NoArgsConstructor
 public abstract class Offer {
-
+    protected final ObjectMapper objectMapper;
     protected String itemName;
 
-    public Offer(String itemName, String metadata) {
+    public Offer(ObjectMapper objectMapper, String itemName, String metadata) {
+        this.objectMapper = objectMapper;
         this.itemName = itemName;
         parseMetadata(metadata);
     }

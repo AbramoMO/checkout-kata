@@ -32,7 +32,7 @@ public class PriceService {
 
 
     @Transactional(readOnly = true)
-    public int calculateTotalPrice(CheckoutRequest checkoutRequest) {
+    public long calculateTotalPrice(CheckoutRequest checkoutRequest) {
         List<String> items = checkoutRequest.items();
         if (items == null || items.isEmpty()) {
             log.info("No items in checkoutRequest");
@@ -71,10 +71,10 @@ public class PriceService {
     }
 
 
-    private static int calculateTotalPrice(List<ItemContainer> itemContainers,
+    private static long calculateTotalPrice(List<ItemContainer> itemContainers,
         Map<String, List<OfferHolder>> offersByItem) {
         log.info("Calculating total price");
-        int totalPrice = 0;
+        long totalPrice = 0;
 
         for (ItemContainer itemContainer : itemContainers) {
             List<OfferHolder> availableOffersForItem = offersByItem.getOrDefault(

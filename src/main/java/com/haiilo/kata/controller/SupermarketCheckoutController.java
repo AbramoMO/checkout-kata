@@ -20,7 +20,7 @@ public class SupermarketCheckoutController {
 
     @PostMapping("checkout")
     public ResponseEntity<CheckoutResponse> checkout(@Valid @RequestBody CheckoutRequest checkoutRequest) {
-        int totalPriceInMinor = priceService.calculateTotalPrice(checkoutRequest);
+        long totalPriceInMinor = priceService.calculateTotalPrice(checkoutRequest);
         return ResponseEntity.ok(new CheckoutResponse(totalPriceInMinor));
     }
 }

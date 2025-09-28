@@ -1,42 +1,41 @@
 package com.haiilo.kata.service.offer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.haiilo.kata.domainobject.OfferDO;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
+@CacheConfig(cacheNames = "offers")
 public class OfferFactory {
 
-    private final Map<Integer, Offer> cache = new ConcurrentHashMap<>();
+    public OfferFactory(ObjectMapper objectMapper) {
+        registry = Map.of(
+            OfferType.N_FOR_FIXED.toString(),
+            offerDO -> new NForFixedPriceOffer(objectMapper, offerDO.getItem(), offerDO.getMetadata())
+        );
+    }
 
     public enum OfferType {
         N_FOR_FIXED
     }
 
-    private final DefaultOffer defaultOffer = new DefaultOffer();
+    private final Map<String, Function<OfferDO, Offer>> registry;
 
-    private final Map<String, Function<OfferDO, Offer>> registry = Map.of(
-        OfferType.N_FOR_FIXED.toString(),
-        offerDO -> new NForFixedPriceOffer(offerDO.getItem(), offerDO.getMetadata())
-    );
-
+    @Cacheable(key = "#offerDO.id", unless = "#result instanceof T(com.haiilo.kata.service.offer.DefaultOffer)")
     public Offer getOrCreate(OfferDO offerDO) {
-        return cache.computeIfAbsent(
-            offerDO.getId(), id -> {
-                Function<OfferDO, Offer> builder = registry.get(offerDO.getType());
-                if (builder == null) {
-                    log.error("Undefined strategy [{}], using default instead", offerDO.getType());
-                    return defaultOffer;
-                }
+        Function<OfferDO, Offer> builder = registry.get(offerDO.getType());
+        if (builder == null) {
+            log.error("Undefined strategy [{}], using default instead", offerDO.getType());
+            return DefaultOffer.DEFAULT_INSTANCE;
+        }
 
-                return builder.apply(offerDO);
-            });
+        return builder.apply(offerDO);
     }
 }
 

@@ -1,5 +1,5 @@
 package com.haiilo.kata.domaintransferobject;
 
-public record CheckoutResponse(int totalPriceInMinor) {
+public record CheckoutResponse(long totalPriceInMinor) {
 
 }

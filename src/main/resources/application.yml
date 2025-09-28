@@ -15,5 +15,10 @@ spring:
     console:
       enabled: true
       path: /h2
-
-logging.level.org.hibernate.SQL: debug
+  spring:
+    cache:
+      type: caffeine
+      cache-names: offers
+      caffeine:
+        spec: maximumSize=10000,expireAfterWrite=10m
+logging.level.org.hibernate.SQL: info

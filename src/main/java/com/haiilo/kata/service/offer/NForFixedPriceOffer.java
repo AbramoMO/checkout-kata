@@ -10,8 +10,8 @@ public class NForFixedPriceOffer extends Offer {
     private int n;                    // bundle size (e.g., 2)
     private int bundlePriceInMinor;   // total price for the bundle (e.g., 45)
 
-    public NForFixedPriceOffer(String itemName, String metadata) {
-        super(itemName, metadata);
+    public NForFixedPriceOffer(ObjectMapper objectMapper, String itemName, String metadata) {
+        super(objectMapper, itemName, metadata);
     }
 
     @Override
